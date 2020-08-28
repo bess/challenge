@@ -1,0 +1,37 @@
+<%= form_with(model: mood, local: true) do |form| %>
+  <% if mood.errors.any? %>
+    <div id="error_explanation">
+      <h2><%= pluralize(mood.errors.count, "error") %> prohibited this mood from being saved:</h2>
+
+      <ul>
+        <% mood.errors.full_messages.each do |message| %>
+          <li><%= message %></li>
+        <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <div class="field">
+    <%= form.label :user_id %>
+    <%= form.text_field :user_id %>
+  </div>
+
+  <div class="field">
+    <%= form.label :date %>
+    <%= form.datetime_select :date %>
+  </div>
+
+  <div class="field">
+    <%= form.label :mood %>
+    <%= form.number_field :mood %>
+  </div>
+
+  <div class="field">
+    <%= form.label :description %>
+    <%= form.text_field :description %>
+  </div>
+
+  <div class="actions">
+    <%= form.submit %>
+  </div>
+<% end %>
