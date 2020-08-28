@@ -1,0 +1,19 @@
+<p id="notice"><%= notice %></p>
+
+<p>
+  <strong>User:</strong>
+  <%= @stress.user_id %>
+</p>
+
+<p>
+  <strong>Date:</strong>
+  <%= @stress.date %>
+</p>
+
+<p>
+  <strong>Stress:</strong>
+  <%= @stress.stress %>
+</p>
+
+<%= link_to 'Edit', edit_stress_path(@stress) %> |
+<%= link_to 'Back', stresses_path %>
