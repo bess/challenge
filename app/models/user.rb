@@ -3,6 +3,7 @@ require 'csv'
 class User < ApplicationRecord
   has_many :moods
   has_many :stresses
+  has_many :streaks
 
   def self.import_file
     return Rails.root.join('spec','fixtures','dataset','users.csv') if Rails.env == 'test'
@@ -58,6 +59,70 @@ class User < ApplicationRecord
     bad_days = bad_days_in_a_week(date)
     return true if bad_days >= 2
     false
+  end
+
+  def earliest_mood_date
+    moods.order(date: :asc).first.date
+  end
+
+  def latest_mood_date
+    moods.order(date: :asc).last.date
+  end
+
+  def earliest_stress_date
+    stresses.order(date: :asc).first.date
+  end
+
+  def latest_stress_date
+    stresses.order(date: :asc).last.date
+  end
+
+  def first_data_day
+    return earliest_mood_date if earliest_mood_date < earliest_stress_date
+    earliest_stress_date
+  end
+
+  def last_data_day
+    return latest_mood_date if latest_mood_date > latest_stress_date
+    latest_stress_date
+  end
+
+  def detect_bad_day_streaks
+    current_day = first_data_day
+    on_a_streak = false
+    streak_start_date = nil
+    number_of_days_in_streak = 0
+    while current_day <= last_data_day
+      puts "#{current_day} : #{bad_day?(current_day)}"
+      if bad_day?(current_day)
+        # Start a streak
+        if !on_a_streak
+          on_a_streak = true
+          streak_start_date = current_day
+        end
+        number_of_days_in_streak += 1
+      else
+        # end a streak if the current day is not a bad day
+        if on_a_streak
+          s = Streak.create(user_id: id, bad_days: number_of_days_in_streak, starting_date: streak_start_date)
+          puts s.inspect
+          on_a_streak = false
+          number_of_days_in_streak = 0
+        end
+      end
+
+      # also end the streak if today is the last day for which we have data
+      if current_day == last_data_day
+        if on_a_streak
+          s = Streak.create(user_id: id, bad_days: number_of_days_in_streak, starting_date: streak_start_date)
+          puts s.inspect
+          on_a_streak = false
+          number_of_days_in_streak = 0
+        end
+      end
+
+      current_day += 1.day
+    end
   end
 
 end

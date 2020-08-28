@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2020_08_28_014011) do
+ActiveRecord::Schema.define(version: 2020_08_28_033837) do
 
   create_table "moods", force: :cascade do |t|
     t.integer "user_id", null: false
@@ -20,6 +20,15 @@ ActiveRecord::Schema.define(version: 2020_08_28_014011) do
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
     t.index ["user_id"], name: "index_moods_on_user_id"
+  end
+
+  create_table "streaks", force: :cascade do |t|
+    t.integer "user_id", null: false
+    t.integer "bad_days"
+    t.date "starting_date"
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+    t.index ["user_id"], name: "index_streaks_on_user_id"
   end
 
   create_table "stresses", force: :cascade do |t|
@@ -40,5 +49,6 @@ ActiveRecord::Schema.define(version: 2020_08_28_014011) do
   end
 
   add_foreign_key "moods", "users"
+  add_foreign_key "streaks", "users"
   add_foreign_key "stresses", "users"
 end

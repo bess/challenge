@@ -89,6 +89,42 @@ RSpec.describe User, type: :model do
     end
   end
 
+  context "streaks of bad days" do
+    # It shouldn't be necessary to clean the database like this each time, but
+    # for some reason I'm getting an error and this is an expeident solution
+    before :all do
+      Stress.destroy_all
+      Mood.destroy_all
+      Streak.destroy_all
+      User.destroy_all
+      User.import_from_csv
+      Mood.import_from_csv
+      Stress.import_from_csv
+      @user = User.first
+    end
+    it "knows the earliest date for a user's mood" do
+      expect(@user.earliest_mood_date).to eq "2017-01-01"
+    end
+    it "knows the earliest date for a user's stress" do
+      expect(@user.earliest_stress_date).to eq "2017-01-01"
+    end
+    it "knows the latest date for a user's mood" do
+      expect(@user.latest_mood_date).to eq "2017-06-01"
+    end
+    it "knows the latest date for a user's stress" do
+      expect(@user.latest_stress_date).to eq "2017-06-01"
+    end
+    it "knows the total span of data" do
+      expect(@user.first_data_day).to eq "2017-01-01"
+      expect(@user.last_data_day).to eq "2017-06-01"
+    end
+    it "records streaks of bad days" do
+      @user.detect_bad_day_streaks
+      longest_streak = Streak.all.order(bad_days: :desc).first
+      expect(longest_streak.bad_days).to eq 5
+    end
+  end
+
   # it "knows when a day was 'bad'" do
   #   User.import_from_csv
   #   Mood.import_from_csv
